@@ -79,7 +79,7 @@ pip install -r requirements.txt ```
 To run inference on a test video file, head into the root directory and run the command: 
 
 ```
-python people_counter.py --prototxt detector/MobileNetSSD_deploy.prototxt --model detector/MobileNetSSD_deploy.caffemodel --input utils/data/tests/test_1.mp4
+python people_counter.py --prototxt detector/MobileNetSSD_deploy.prototxt --model detector/MobileNetSSD_deploy.caffemodel --input test_1.mp4
 ```
 
 ### Webcam
