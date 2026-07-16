@@ -57,9 +57,17 @@ People Counting in Real-Time using live video stream/IP camera in OpenCV.
 
 ## Running Inference
 
+### Create a virtual environment(venv) 
+
+create a virtual environment: ```
+python -m venv venv-name ```
+
+### activate the venv:
+``` venv-name\Scripts\activate ```
+
 ### Install the dependencies
 
-First up, install all the required Python dependencies by running: ```
+install all the required Python dependencies by running: ```
 pip install -r requirements.txt ```
 
 > NOTE: Supported Python version is 3.11.3 (there can always be version conflicts between the dependencies, OS, hardware etc.).
