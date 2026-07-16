@@ -43,7 +43,19 @@ def parse_arguments():
 
 
 def send_mail():
-    Mailer().send(config["Email_Receive"])
+    if not (
+        config["Email_Send"]
+        and config["Email_Receive"]
+        and config["Email_Password"]
+    ):
+        logger.warning("Email configuration missing.")
+        return
+
+    try:
+        Mailer().send(config["Email_Receive"])
+        logger.info("Alert email sent.")
+    except Exception as e:
+        logger.error(f"Email could not be sent: {e}")
 
 
 def log_data(move_in, in_time, move_out, out_time):
@@ -100,7 +112,8 @@ def people_counter():
     totalFrames = 0
     totalDown = 0
     totalUp = 0
-    total = []
+    people_inside = 0
+    alert_sent = False
     move_out = []
     move_in = []
     out_time = []
@@ -198,6 +211,8 @@ def people_counter():
                         totalUp += 1
                         move_out.append(totalUp)
                         out_time.append(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
+
+                        people_inside = len(move_in) - len(move_out)
                         to.counted = True
 
                     # ENTER (moving downward)
@@ -206,10 +221,8 @@ def people_counter():
                         move_in.append(totalDown)
                         in_time.append(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
 
-                        total = []
-                        total.append(len(move_in) - len(move_out))
+                        people_inside = len(move_in) - len(move_out)
                         to.counted = True
-
             trackableObjects[objectID] = to
 
             text = f"ID {objectID}"
@@ -225,7 +238,7 @@ def people_counter():
             ("Status", status)
         ]
 
-        info_total = [("Total people inside", ', '.join(map(str, total)))]
+        info_total = [("Total people inside", people_inside)]
 
         for (i, (k, v)) in enumerate(info_status):
             text = f"{k}: {v}"
@@ -236,6 +249,28 @@ def people_counter():
             text = f"{k}: {v}"
             cv2.putText(frame, text, (250, H - ((i * 20) + 60)),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+# ================= THRESHOLD CHECKER =================
+
+        if people_inside >= config["Threshold"]:
+
+            cv2.putText(frame,
+                    "ALERT! THRESHOLD EXCEEDED",
+                    (10, 40),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.8,
+                    (0, 0, 255),
+                    2)
+
+            if config["ALERT"] and not alert_sent:
+                send_mail()
+                logger.info("Alert email sent.")
+                alert_sent = True
+
+        else:
+            alert_sent = False
+
+# =====================================================
+
 
         if config.get("Log"):
             log_data(move_in, in_time, move_out, out_time)
