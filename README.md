@@ -59,8 +59,8 @@ People Counting in Real-Time using live video stream/IP camera in OpenCV.
 
 ### Create a virtual environment(venv) 
 
-create a virtual environment: ```
-python -m venv venv-name ```
+create a virtual environment:
+``` python -m venv venv-name ```
 
 ### activate the venv:
 ``` venv-name\Scripts\activate ```
